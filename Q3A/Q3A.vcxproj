@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3F0D30B6-6E95-4C80-95AC-BAD537364E7C}</ProjectGuid>
+    <ProjectName>MHQ3A</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</EmbedManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <StackReserveSize>8388608</StackReserveSize>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <StackReserveSize>8388608</StackReserveSize>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="jchuff.h" />
+    <ClInclude Include="jconfig.h" />
+    <ClInclude Include="jdct.h" />
+    <ClInclude Include="jdhuff.h" />
+    <ClInclude Include="jerror.h" />
+    <ClInclude Include="jinclude.h" />
+    <ClInclude Include="jmemsys.h" />
+    <ClInclude Include="jmorecfg.h" />
+    <ClInclude Include="jpegint.h" />
+    <ClInclude Include="jpeglib.h" />
+    <ClInclude Include="jversion.h" />
+    <ClInclude Include="aasfile.h" />
+    <ClInclude Include="be_aas.h" />
+    <ClInclude Include="be_aas_bsp.h" />
+    <ClInclude Include="be_aas_cluster.h" />
+    <ClInclude Include="be_aas_debug.h" />
+    <ClInclude Include="be_aas_def.h" />
+    <ClInclude Include="be_aas_entity.h" />
+    <ClInclude Include="be_aas_file.h" />
+    <ClInclude Include="be_aas_funcs.h" />
+    <ClInclude Include="be_aas_main.h" />
+    <ClInclude Include="be_aas_move.h" />
+    <ClInclude Include="be_aas_optimize.h" />
+    <ClInclude Include="be_aas_reach.h" />
+    <ClInclude Include="be_aas_route.h" />
+    <ClInclude Include="be_aas_routealt.h" />
+    <ClInclude Include="be_aas_sample.h" />
+    <ClInclude Include="be_ai_char.h" />
+    <ClInclude Include="be_ai_chat.h" />
+    <ClInclude Include="be_ai_gen.h" />
+    <ClInclude Include="be_ai_goal.h" />
+    <ClInclude Include="be_ai_move.h" />
+    <ClInclude Include="be_ai_weap.h" />
+    <ClInclude Include="be_ai_weight.h" />
+    <ClInclude Include="be_ea.h" />
+    <ClInclude Include="be_interface.h" />
+    <ClInclude Include="bg_public.h" />
+    <ClInclude Include="botlib.h" />
+    <ClInclude Include="l_crc.h" />
+    <ClInclude Include="l_libvar.h" />
+    <ClInclude Include="l_log.h" />
+    <ClInclude Include="l_memory.h" />
+    <ClInclude Include="l_precomp.h" />
+    <ClInclude Include="l_script.h" />
+    <ClInclude Include="l_struct.h" />
+    <ClInclude Include="l_utils.h" />
+    <ClInclude Include="glw_win.h" />
+    <ClInclude Include="qgl.h" />
+    <ClInclude Include="surfaceflags.h" />
+    <ClInclude Include="tr_local.h" />
+    <ClInclude Include="tr_matrix.h" />
+    <ClInclude Include="tr_program.h" />
+    <ClInclude Include="tr_public.h" />
+    <ClInclude Include="tr_types.h" />
+    <ClInclude Include="cg_public.h" />
+    <ClInclude Include="client.h" />
+    <ClInclude Include="cm_local.h" />
+    <ClInclude Include="cm_patch.h" />
+    <ClInclude Include="cm_polylib.h" />
+    <ClInclude Include="cm_public.h" />
+    <ClInclude Include="g_public.h" />
+    <ClInclude Include="keycodes.h" />
+    <ClInclude Include="keys.h" />
+    <ClInclude Include="q_shared.h" />
+    <ClInclude Include="qcommon.h" />
+    <ClInclude Include="qfiles.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="server.h" />
+    <ClInclude Include="snd_local.h" />
+    <ClInclude Include="snd_public.h" />
+    <ClInclude Include="ui_public.h" />
+    <ClInclude Include="unzip.h" />
+    <ClInclude Include="vm_local.h" />
+    <ClInclude Include="win_local.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="jcapimin.c" />
+    <ClCompile Include="jccoefct.c" />
+    <ClCompile Include="jccolor.c" />
+    <ClCompile Include="jcdctmgr.c" />
+    <ClCompile Include="jchuff.c" />
+    <ClCompile Include="jcinit.c" />
+    <ClCompile Include="jcmainct.c" />
+    <ClCompile Include="jcmarker.c" />
+    <ClCompile Include="jcmaster.c" />
+    <ClCompile Include="jcomapi.c" />
+    <ClCompile Include="jcparam.c" />
+    <ClCompile Include="jcphuff.c" />
+    <ClCompile Include="jcprepct.c" />
+    <ClCompile Include="jcsample.c" />
+    <ClCompile Include="jctrans.c" />
+    <ClCompile Include="jdapimin.c" />
+    <ClCompile Include="jdapistd.c" />
+    <ClCompile Include="jdatadst.c" />
+    <ClCompile Include="jdatasrc.c" />
+    <ClCompile Include="jdcoefct.c" />
+    <ClCompile Include="jdcolor.c" />
+    <ClCompile Include="jddctmgr.c" />
+    <ClCompile Include="jdhuff.c" />
+    <ClCompile Include="jdinput.c" />
+    <ClCompile Include="jdmainct.c" />
+    <ClCompile Include="jdmarker.c" />
+    <ClCompile Include="jdmaster.c" />
+    <ClCompile Include="jdpostct.c" />
+    <ClCompile Include="jdsample.c" />
+    <ClCompile Include="jdtrans.c" />
+    <ClCompile Include="jerror.c" />
+    <ClCompile Include="jfdctflt.c" />
+    <ClCompile Include="jidctflt.c" />
+    <ClCompile Include="jmemmgr.c" />
+    <ClCompile Include="jmemnobs.c" />
+    <ClCompile Include="jutils.c" />
+    <ClCompile Include="be_aas_bspq3.c" />
+    <ClCompile Include="be_aas_cluster.c" />
+    <ClCompile Include="be_aas_debug.c" />
+    <ClCompile Include="be_aas_entity.c" />
+    <ClCompile Include="be_aas_file.c" />
+    <ClCompile Include="be_aas_main.c" />
+    <ClCompile Include="be_aas_move.c" />
+    <ClCompile Include="be_aas_optimize.c" />
+    <ClCompile Include="be_aas_reach.c" />
+    <ClCompile Include="be_aas_route.c" />
+    <ClCompile Include="be_aas_routealt.c" />
+    <ClCompile Include="be_aas_sample.c" />
+    <ClCompile Include="be_ai_char.c" />
+    <ClCompile Include="be_ai_chat.c" />
+    <ClCompile Include="be_ai_gen.c" />
+    <ClCompile Include="be_ai_goal.c" />
+    <ClCompile Include="be_ai_move.c" />
+    <ClCompile Include="be_ai_weap.c" />
+    <ClCompile Include="be_ai_weight.c" />
+    <ClCompile Include="be_ea.c" />
+    <ClCompile Include="be_interface.c" />
+    <ClCompile Include="l_crc.c" />
+    <ClCompile Include="l_libvar.c" />
+    <ClCompile Include="l_log.c" />
+    <ClCompile Include="l_memory.c" />
+    <ClCompile Include="l_precomp.c" />
+    <ClCompile Include="l_script.c" />
+    <ClCompile Include="l_struct.c" />
+    <ClCompile Include="tr_animation.c" />
+    <ClCompile Include="tr_backend.c" />
+    <ClCompile Include="tr_bsp.c" />
+    <ClCompile Include="tr_cmds.c" />
+    <ClCompile Include="tr_curve.c" />
+    <ClCompile Include="tr_font.c" />
+    <ClCompile Include="tr_image.c" />
+    <ClCompile Include="tr_init.c" />
+    <ClCompile Include="tr_light.c" />
+    <ClCompile Include="tr_main.c" />
+    <ClCompile Include="tr_marks.c" />
+    <ClCompile Include="tr_matrix.c" />
+    <ClCompile Include="tr_mesh.c" />
+    <ClCompile Include="tr_model.c" />
+    <ClCompile Include="tr_noise.c" />
+    <ClCompile Include="tr_program.c" />
+    <ClCompile Include="tr_scene.c" />
+    <ClCompile Include="tr_shade.c" />
+    <ClCompile Include="tr_shade_calc.c" />
+    <ClCompile Include="tr_shader.c" />
+    <ClCompile Include="tr_shadows.c" />
+    <ClCompile Include="tr_sky.c" />
+    <ClCompile Include="tr_surface.c" />
+    <ClCompile Include="tr_world.c" />
+    <ClCompile Include="win_gamma.c" />
+    <ClCompile Include="win_glimp.c" />
+    <ClCompile Include="win_qgl.c" />
+    <ClCompile Include="cl_cgame.c" />
+    <ClCompile Include="cl_cin.c" />
+    <ClCompile Include="cl_console.c" />
+    <ClCompile Include="cl_input.c" />
+    <ClCompile Include="cl_keys.c" />
+    <ClCompile Include="cl_main.c" />
+    <ClCompile Include="cl_net_chan.c" />
+    <ClCompile Include="cl_parse.c" />
+    <ClCompile Include="cl_scrn.c" />
+    <ClCompile Include="cl_ui.c" />
+    <ClCompile Include="snd_adpcm.c" />
+    <ClCompile Include="snd_dma.c" />
+    <ClCompile Include="snd_mem.c" />
+    <ClCompile Include="snd_mix.c" />
+    <ClCompile Include="snd_wavelet.c" />
+    <ClCompile Include="sv_bot.c" />
+    <ClCompile Include="sv_ccmds.c" />
+    <ClCompile Include="sv_client.c" />
+    <ClCompile Include="sv_game.c" />
+    <ClCompile Include="sv_init.c" />
+    <ClCompile Include="sv_main.c" />
+    <ClCompile Include="sv_net_chan.c" />
+    <ClCompile Include="sv_snapshot.c" />
+    <ClCompile Include="sv_world.c" />
+    <ClCompile Include="vm.c" />
+    <ClCompile Include="vm_interpreted.c" />
+    <ClCompile Include="vm_x86.c" />
+    <ClCompile Include="cm_load.c" />
+    <ClCompile Include="cm_patch.c" />
+    <ClCompile Include="cm_polylib.c" />
+    <ClCompile Include="cm_test.c" />
+    <ClCompile Include="cm_trace.c" />
+    <ClCompile Include="win_input.c" />
+    <ClCompile Include="win_main.c" />
+    <ClCompile Include="win_net.c" />
+    <ClCompile Include="win_shared.c" />
+    <ClCompile Include="win_snd.c" />
+    <ClCompile Include="win_syscon.c" />
+    <ClCompile Include="win_wndproc.c" />
+    <ClCompile Include="cmd.c" />
+    <ClCompile Include="common.c" />
+    <ClCompile Include="cvar.c" />
+    <ClCompile Include="files.c" />
+    <ClCompile Include="huffman.c" />
+    <ClCompile Include="md4.c" />
+    <ClCompile Include="msg.c" />
+    <ClCompile Include="net_chan.c" />
+    <ClCompile Include="q_math.c" />
+    <ClCompile Include="q_shared.c" />
+    <ClCompile Include="unzip.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="qe3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="winquake.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="brightpass.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="generic.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shade.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="skybox.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dlight.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
