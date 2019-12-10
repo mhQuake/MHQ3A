@@ -1,0 +1,285 @@
+
+struct VS_SHADEVERTEX
+{
+	float4 Position: POSITION0;
+	float4 Color : COLOR0;
+	float2 TexCoord: TEXCOORD0;
+	float2 Lightmap: TEXCOORD1;
+	float3 Normal: NORMAL0;
+};
+
+
+struct PS_SHADEVERTEX
+{
+	float4 Position: POSITION0;
+	float4 Color : COLOR0;
+
+#if defined (TCGEN_ENVIRONMENT_MAPPED)
+	float3 TexCoord: TEXCOORD0;
+	float3 Normal: TEXCOORD1;
+#elif defined (TCGEN_SKY)
+	float3 TexCoord: TEXCOORD0;
+	float2 SkyCoord: TEXCOORD1;
+#elif defined (TCGEN_FOG)
+	float3 TexCoord: TEXCOORD0;
+#else
+	float2 TexCoord: TEXCOORD0;
+#endif
+
+#ifdef TMOD_TURB0
+	float2 TurbCoord0: TEXCOORD3;
+#endif
+
+#ifdef TMOD_TURB1
+	float2 TurbCoord1: TEXCOORD4;
+#endif
+
+#ifdef TMOD_TURB2
+	float2 TurbCoord2: TEXCOORD5;
+#endif
+
+#ifdef TMOD_TURB3
+	float2 TurbCoord3: TEXCOORD6;
+#endif
+};
+
+
+#ifdef VERTEXSHADER
+float4x4 MVPMatrix : register(VSREG_MVPMATRIX);
+float4x4 ProjectionMatrix : register(VSREG_PROJECTIONMATRIX);
+float4x4 WorldMatrix : register(VSREG_MODELVIEWMATRIX);
+float4x4 SkyMatrix : register(VSREG_SKYMATRIX);
+float4 RTInverseSize : register(VSREG_INVERSERT);
+
+float4 GetPositionWithHalfPixelCorrection (float4x4 mvp, float4 inPosition)
+{
+	// correct the dreaded half-texel offset
+	float4 outPosition = mul (mvp, inPosition);
+	outPosition.xy += RTInverseSize.xy * outPosition.w;
+	return outPosition;
+}
+
+// ============================================================================================
+// TMOD_TURB
+// ============================================================================================
+// matches value in gcc v2 math.h
+#define M_PI 3.14159265358979323846
+
+float4 tmTurbTime : register(VSREG_TMODTURBTIME);
+
+float2 RB_CalcTurbTexCoords (float4 Position, float time)
+{
+	return float2 (
+		((Position.x + Position.z) * 1.0f / 128.0f * 0.125f + time) * (M_PI * 2.0f),
+		(Position.y * 1.0f / 128.0f * 0.125f + time) * (M_PI * 2.0f)
+	);
+}
+
+
+// ============================================================================================
+// TCGEN_VECTOR
+// ============================================================================================
+float3 tcGenVector0 : register(VSREG_TCGENVEC0);
+float3 tcGenVector1 : register(VSREG_TCGENVEC1);
+
+float2 RB_CalcVectorTexcoords (float3 Position)
+{
+	return float2 (
+		dot (Position, tcGenVector0),
+		dot (Position, tcGenVector1)
+	);
+}
+
+
+PS_SHADEVERTEX VSMain (VS_SHADEVERTEX vs_in)
+{
+	PS_SHADEVERTEX vs_out;
+
+	vs_out.Position = GetPositionWithHalfPixelCorrection (MVPMatrix, vs_in.Position);
+	vs_out.Color = vs_in.Color.bgra; 	// color was loaded as rgba so switch it back to bgra
+
+#if defined (TCGEN_ENVIRONMENT_MAPPED)
+	vs_out.TexCoord = vs_in.Position.xyz;
+	vs_out.Normal = vs_in.Normal;
+#elif defined (TCGEN_SKY)
+	vs_out.Position.z = vs_out.Position.w;
+	vs_out.TexCoord = mul (SkyMatrix, vs_in.Position).xyz;
+	vs_out.SkyCoord = vs_in.TexCoord;
+#elif defined (TCGEN_LIGHTMAP)
+	vs_out.TexCoord = vs_in.Lightmap;
+#elif defined (TCGEN_VECTOR)
+	vs_out.TexCoord = RB_CalcVectorTexcoords (vs_in.Position.xyz);
+#elif defined (TCGEN_IDENTITY)
+	vs_out.TexCoord = float2 (0, 0);
+#elif defined (TCGEN_FOG)
+	vs_out.TexCoord = vs_in.Position.xyz;
+#else
+	vs_out.TexCoord = vs_in.TexCoord;
+#endif
+
+#ifdef TMOD_TURB0
+	vs_out.TurbCoord0 = RB_CalcTurbTexCoords (vs_in.Position, tmTurbTime.x);
+#endif
+
+#ifdef TMOD_TURB1
+	vs_out.TurbCoord1 = RB_CalcTurbTexCoords (vs_in.Position, tmTurbTime.y);
+#endif
+
+#ifdef TMOD_TURB2
+	vs_out.TurbCoord2 = RB_CalcTurbTexCoords (vs_in.Position, tmTurbTime.z);
+#endif
+
+#ifdef TMOD_TURB3
+	vs_out.TurbCoord3 = RB_CalcTurbTexCoords (vs_in.Position, tmTurbTime.w);
+#endif
+
+	return vs_out;
+}
+#endif
+
+
+#ifdef PIXELSHADER
+texture tmu0Texture : register(TEXTURESTAGE);
+sampler tmu0Sampler : register(SAMPLERSTAGE) = sampler_state { texture = <tmu0Texture>; };
+
+float4 tmMatrix0 : register(PSREG_TMODMATRIX0);
+float4 tmMatrix1 : register(PSREG_TMODMATRIX1);
+float4 tmMatrix2 : register(PSREG_TMODMATRIX2);
+float4 tmMatrix3 : register(PSREG_TMODMATRIX3);
+
+float2 tmTranslate0 : register(PSREG_TRANSLATE0);
+float2 tmTranslate1 : register(PSREG_TRANSLATE1);
+float2 tmTranslate2 : register(PSREG_TRANSLATE2);
+float2 tmTranslate3 : register(PSREG_TRANSLATE3);
+
+float4 tmTurbAmp : register(PSREG_TMODTURBAMP);
+
+
+// ============================================================================================
+// TCGEN_FOG
+// ============================================================================================
+float4 fogDistanceVector : register(PSREG_FOGDISTANCE);
+float4 fogDepthVector : register(PSREG_FOGDEPTH);
+float eyeT : register(PSREG_FOGEYET);
+float eyeOutside : register(PSREG_FOGEYEOUTSIDE);
+
+float2 RB_CalcFogTexcoords (float3 Position)
+{
+	float s = dot (Position, fogDistanceVector.xyz) + fogDistanceVector.w;
+	float t = dot (Position, fogDepthVector.xyz) + fogDepthVector.w;
+
+	if (eyeOutside > 0)
+	{
+		if (t < 1.0f)
+		{
+			// point is outside, so no fogging
+			t = 1.0f / 32.0f;
+		}
+		else
+		{
+			// cut the distance at the fog plane
+			t = 1.0f / 32.0f + 30.0f / 32.0f * t / (t - eyeT);
+		}
+	}
+	else
+	{
+		if (t < 0)
+		{
+			// point is outside, so no fogging
+			t = 1.0f / 32.0f;
+		}
+		else t = 31.0f / 32.0f;
+	}
+
+	return float2 (s, t);
+}
+
+
+// ============================================================================================
+// TCGEN_TEXTURE with shader->isSky
+// ============================================================================================
+float2 RB_CalcCloudTexCoords (float3 skyVec, float radiusWorld, float heightCloud)
+{
+	float3 sqrSkyVec = skyVec * skyVec;
+	float3 v1 = sqrSkyVec * radiusWorld * heightCloud * 2.0;
+	float3 v2 = sqrSkyVec * heightCloud * heightCloud;
+
+	float p = (1.0 / (2.0 * dot (skyVec, skyVec))) *
+		(-2.0 * skyVec.z * radiusWorld +
+		2.0 * sqrt (sqrSkyVec.z * radiusWorld * radiusWorld +
+		v1.x + v1.y + v1.z +
+		v2.x + v2.y + v2.z));
+
+	float3 v = (skyVec * p) + float3 (0.0, 0.0, radiusWorld);
+	float2 st = normalize (v).xy;
+
+	return acos (st);
+}
+
+
+// ============================================================================================
+// TCGEN_ENVIRONMENT_MAPPED
+// ============================================================================================
+float3 viewOrigin : register(PSREG_VIEWORIGIN);
+
+float2 RB_CalcEnvironmentTexCoords (float3 Position, float3 Normal)
+{
+	float3 viewer = normalize (viewOrigin - Position);
+	float2 reflected = reflect (viewer, Normal).yz;
+
+	return float2 (0.5f + reflected.x * 0.5f, 0.5f - reflected.y * 0.5f);
+}
+
+
+// ============================================================================================
+// MAIN
+// ============================================================================================
+float4 PSMain (PS_SHADEVERTEX ps_in) : COLOR0
+{
+	// read the initial texcoord
+#if defined (TCGEN_SKY)
+	float2 st = RB_CalcCloudTexCoords (ps_in.TexCoord, ps_in.SkyCoord.x, ps_in.SkyCoord.y);
+#elif defined (TCGEN_ENVIRONMENT_MAPPED)
+	float2 st = RB_CalcEnvironmentTexCoords (ps_in.TexCoord, ps_in.Normal);
+#elif defined (TCGEN_FOG)
+	float2 st = RB_CalcFogTexcoords (ps_in.TexCoord);
+#else
+	float2 st = ps_in.TexCoord;
+#endif
+
+	// apply the TMODs in order; a shader can have up to 4 TMODs, one from each set
+	// all tmods aside from turb are generalized as a 3x2 (or 2x3) matrix multiplication
+	// ideally so should turb be (a stretch and squeeze effect) so that we can generalize everything
+	// and precalc them as one stage only on the CPU
+	// tmods MUST stay in the pixel shader because they could be applied to a tcgen that's evaluated
+	// in the pixel shader.  in theory we could 
+#if defined (TMOD_TURB0)
+	st += sin (ps_in.TurbCoord0) * tmTurbAmp.x;
+#elif defined (TMOD_TRANSFORM0)
+	st = mul (float2x2 (tmMatrix0.xzyw), st) + tmTranslate0;
+#endif
+
+#if defined (TMOD_TURB1)
+	st += sin (ps_in.TurbCoord1) * tmTurbAmp.y;
+#elif defined (TMOD_TRANSFORM1)
+	st = mul (float2x2 (tmMatrix1.xzyw), st) + tmTranslate1;
+#endif
+
+#if defined (TMOD_TURB2)
+	st += sin (ps_in.TurbCoord2) * tmTurbAmp.z;
+#elif defined TMOD_TRANSFORM2
+	st = mul (float2x2 (tmMatrix2.xzyw), st) + tmTranslate2;
+#endif
+
+#if defined (TMOD_TURB3)
+	st += sin (ps_in.TurbCoord3) * tmTurbAmp.w;
+#elif defined (TMOD_TRANSFORM3)
+	st = mul (float2x2 (tmMatrix3.xzyw), st) + tmTranslate3;
+#endif
+
+	// read the texture with the final generated and modified texcoord;
+	// the textures were loaded as RGBA so here we must swizzle them back to BGRA
+	return tex2D (tmu0Sampler, st).bgra * ps_in.Color;
+}
+#endif
+
