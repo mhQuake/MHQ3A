@@ -234,6 +234,14 @@ float2 RB_CalcEnvironmentTexCoords (float3 Position, float3 Normal)
 // ============================================================================================
 // MAIN
 // ============================================================================================
+float4 r_gamma : register(PSREG_GAMMA);
+float4 r_brightness : register(PSREG_BRIGHTNESS);
+
+float4 GetGammaAndBrightness (float4 color)
+{
+	return float4 (pow (max (color.rgb, 0.0f), r_gamma.x) * r_brightness.x, color.a);
+}
+
 float4 PSMain (PS_SHADEVERTEX ps_in) : COLOR0
 {
 	// read the initial texcoord
@@ -279,7 +287,7 @@ float4 PSMain (PS_SHADEVERTEX ps_in) : COLOR0
 
 	// read the texture with the final generated and modified texcoord;
 	// the textures were loaded as RGBA so here we must swizzle them back to BGRA
-	return tex2D (tmu0Sampler, st).bgra * ps_in.Color;
+	return GetGammaAndBrightness (tex2D (tmu0Sampler, st).bgra * ps_in.Color);
 }
 #endif
 

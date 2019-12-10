@@ -449,8 +449,7 @@ qboolean QGL_CheckScene (void)
 	// issue a beginscene call if we haven't had one yet
 	if (!glState.inBeginScene)
 	{
-		// always clear the rendertarget every frame because the brightpass will otherwise accumulate what
-		// was previously there if the previous frame wasn't fully overdrawn
+		// always clear the rendertarget every frame
 		d3d_Device->lpVtbl->Clear (d3d_Device, 0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
 		if (SUCCEEDED (d3d_Device->lpVtbl->BeginScene (d3d_Device)))

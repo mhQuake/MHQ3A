@@ -347,6 +347,17 @@ void RB_SetupObliqueNearPlane (float *matrix, float *clipPlane)
 }
 
 
+void RB_SetGammaAndBrightness (void)
+{
+	// rather than doing a separate brightpass we'll setup gamma and brightness in our shaders
+	float gamma[4] = {r_gamma->value, r_gamma->value, r_gamma->value, r_gamma->value};
+	float brightness[4] = {r_brightness->value, r_brightness->value, r_brightness->value, r_brightness->value};
+
+	d3d_Device->lpVtbl->SetPixelShaderConstantF (d3d_Device, PSREG_GAMMA, gamma, 1);
+	d3d_Device->lpVtbl->SetPixelShaderConstantF (d3d_Device, PSREG_BRIGHTNESS, brightness, 1);
+}
+
+
 /*
 =================
 RB_BeginDrawingView
@@ -357,6 +368,8 @@ to actually render the visible surfaces for this view
 */
 void RB_BeginDrawingView (void)
 {
+	RB_SetGammaAndBrightness ();
+
 	// sync with gl if needed
 	if (r_finish->integer == 1 && !glState.finishCalled)
 	{
@@ -649,6 +662,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 {
 	if (!QGL_CheckScene ()) return;
 
+	RB_SetGammaAndBrightness ();
 	R_SyncRenderThread ();
 
 	int start = 0;
@@ -900,26 +914,6 @@ void RB_ShowImages (void)
 }
 
 
-void RB_BrightPass (void)
-{
-	D3DVIEWPORT9 vp = {0, 0, glConfig.vidWidth, glConfig.vidHeight, 0, 1};
-	RB_SetViewportAndHalfPixelCorrection (&vp);
-
-	GL_State (GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ONE);
-	GL_Cull (CT_TWO_SIDED);
-	RB_SetProgram (&r_brightpassProgram);
-
-	brightpassvert_t verts[] = {
-		{{-1, -1, 0}, 0xffffffff},
-		{{1, -1, 0}, 0xffffffff},
-		{{1, 1, 0}, 0xffffffff},
-		{{-1, 1, 0}, 0xffffffff}
-	};
-
-	d3d_Device->lpVtbl->DrawPrimitiveUP (d3d_Device, D3DPT_TRIANGLEFAN, 2, verts, sizeof (brightpassvert_t));
-}
-
-
 /*
 =============
 RB_SwapBuffers
@@ -968,9 +962,6 @@ const void	*RB_SwapBuffers (const void *data)
 
 		tr.hasStretchRaw = qfalse;
 	}
-
-	// run our brightpass to bring everything back up to normal scale
-	RB_BrightPass ();
 
 	if (tr.screenshotRequested)
 	{

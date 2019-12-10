@@ -33,6 +33,8 @@
 #define PSREG_DLORIGIN				15
 #define PSREG_DLCOLOUR				16
 #define PSREG_IDENTITYLIGHT			17
+#define PSREG_GAMMA					18
+#define PSREG_BRIGHTNESS			19
 
 typedef struct program_s
 {
@@ -42,7 +44,6 @@ typedef struct program_s
 } program_t;
 
 extern program_t r_genericProgram;
-extern program_t r_brightpassProgram;
 extern program_t r_skyboxProgram;
 extern program_t r_dlightProgram;
 
@@ -66,13 +67,6 @@ typedef struct genericvert_s
 	DWORD color;
 	float uv[2];
 } genericvert_t;
-
-
-typedef struct brightpassvert_s
-{
-	float xyz[3];
-	DWORD color;
-} brightpassvert_t;
 
 
 typedef struct stagestaticvert_s

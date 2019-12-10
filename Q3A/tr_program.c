@@ -61,6 +61,8 @@ static D3D_SHADER_MACRO staticDefines[] = {
 	DEFINE_SHADER_REGISTER (PSREG_DLORIGIN),
 	DEFINE_SHADER_REGISTER (PSREG_DLCOLOUR),
 	DEFINE_SHADER_REGISTER (PSREG_IDENTITYLIGHT),
+	DEFINE_SHADER_REGISTER (PSREG_GAMMA),
+	DEFINE_SHADER_REGISTER (PSREG_BRIGHTNESS),
 	// we always need to close the static defines in case a generated shader adds no new defines
 	{NULL, NULL}
 };
@@ -87,7 +89,6 @@ pD3DCompile QD3DCompile = NULL;
 
 // these are our built-in programs for simple drawing
 program_t r_genericProgram;
-program_t r_brightpassProgram;
 program_t r_skyboxProgram;
 program_t r_dlightProgram;
 
@@ -340,7 +341,6 @@ void GL_InitPrograms (void)
 
 		// now create our builtin programs - for simplicity these will use FVF codes instead of full decls
 		R_CreateBuiltinProgram (&r_genericProgram, IDR_GENERIC_HLSL, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-		R_CreateBuiltinProgram (&r_brightpassProgram, IDR_BRIGHTPASS_HLSL, D3DFVF_XYZ | D3DFVF_DIFFUSE);
 		R_CreateBuiltinProgram (&r_skyboxProgram, IDR_SKYBOX_HLSL, D3DFVF_XYZ | D3DFVF_TEX1);
 		R_CreateBuiltinProgram (&r_dlightProgram, IDR_DLIGHT_HLSL, D3DFVF_XYZ);
 
@@ -412,7 +412,6 @@ void GL_ShutdownPrograms (void)
 	}
 
 	R_ShutdownProgram (&r_genericProgram);
-	R_ShutdownProgram (&r_brightpassProgram);
 	R_ShutdownProgram (&r_skyboxProgram);
 	R_ShutdownProgram (&r_dlightProgram);
 

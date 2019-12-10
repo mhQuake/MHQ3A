@@ -352,9 +352,6 @@
     <ResourceCompile Include="winquake.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="brightpass.hlsl">
-      <FileType>Document</FileType>
-    </None>
     <None Include="generic.hlsl">
       <FileType>Document</FileType>
     </None>

@@ -103,6 +103,7 @@ cvar_t	*r_swapInterval;
 cvar_t	*r_textureMode;
 cvar_t	*r_depthBiasFactor;
 cvar_t	*r_gamma;
+cvar_t	*r_brightness;
 cvar_t	*r_intensity;
 cvar_t	*r_lockpvs;
 cvar_t	*r_noportals;
@@ -666,11 +667,8 @@ void R_Register (void)
 	r_textureMode = ri.Cvar_Get ("r_textureMode", "GL_LINEAR_MIPMAP_NEAREST", CVAR_ARCHIVE);
 	r_swapInterval = ri.Cvar_Get ("r_swapInterval", "0", CVAR_ARCHIVE);
 
-#ifdef __MACOS__
-	r_gamma = ri.Cvar_Get ("r_gamma", "1.2", CVAR_ARCHIVE);
-#else
 	r_gamma = ri.Cvar_Get ("r_gamma", "1", CVAR_ARCHIVE);
-#endif
+	r_brightness = ri.Cvar_Get ("r_brightness", "1", CVAR_ARCHIVE);
 
 	r_facePlaneCull = ri.Cvar_Get ("r_facePlaneCull", "1", CVAR_ARCHIVE);
 

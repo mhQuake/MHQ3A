@@ -37,6 +37,14 @@ float radius : register(PSREG_DLRADIUS);
 float3 origin : register(PSREG_DLORIGIN);
 float3 colour : register(PSREG_DLCOLOUR);
 
+float4 r_gamma : register(PSREG_GAMMA);
+float4 r_brightness : register(PSREG_BRIGHTNESS);
+
+float4 GetGammaAndBrightness (float4 color)
+{
+	return float4 (pow (max (color.rgb, 0.0f), r_gamma.x) * r_brightness.x, color.a);
+}
+
 float4 PSMain (PS_DLIGHT ps_in) : COLOR0
 {
 	float dist = radius - length (ps_in.TexCoord - origin);
@@ -44,7 +52,7 @@ float4 PSMain (PS_DLIGHT ps_in) : COLOR0
 	clip (dist);
 
 	// the original engine did inverse-square falloff; this does linear falloff but properly
-	return float4 (colour * (dist / radius), 0);
+	return GetGammaAndBrightness (float4 (colour * (dist / radius), 0));
 }
 #endif
 

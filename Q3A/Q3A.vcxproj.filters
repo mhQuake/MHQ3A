@@ -722,9 +722,6 @@
     <None Include="skybox.hlsl">
       <Filter>Renderer\Shaders</Filter>
     </None>
-    <None Include="brightpass.hlsl">
-      <Filter>Renderer\Shaders</Filter>
-    </None>
     <None Include="generic.hlsl">
       <Filter>Renderer\Shaders</Filter>
     </None>

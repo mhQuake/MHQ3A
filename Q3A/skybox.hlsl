@@ -40,10 +40,18 @@ sampler tmu0Sampler : register(s0) = sampler_state { texture = <tmu0Texture>; };
 
 float4 identityLight : register(PSREG_IDENTITYLIGHT);
 
+float4 r_gamma : register(PSREG_GAMMA);
+float4 r_brightness : register(PSREG_BRIGHTNESS);
+
+float4 GetGammaAndBrightness (float4 color)
+{
+	return float4 (pow (max (color.rgb, 0.0f), r_gamma.x) * r_brightness.x, color.a);
+}
+
 float4 PSMain (GENERICVERTEX ps_in) : COLOR0
 {
 	// the textures were loaded as RGBA so here we must swizzle them back to BGRA
-	return tex2D (tmu0Sampler, ps_in.TexCoord).bgra * identityLight;
+	return GetGammaAndBrightness (tex2D (tmu0Sampler, ps_in.TexCoord).bgra * identityLight);
 }
 #endif
 

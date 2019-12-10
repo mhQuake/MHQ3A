@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "tr_local.h"
+#include "tr_program.h"
 
 int			r_firstSceneDrawSurf;
 
@@ -261,6 +262,7 @@ void RE_AddAdditiveLightToScene (const vec3_t org, float intensity, float r, flo
 {
 	RE_AddDynamicLightToScene (org, intensity, r, g, b, qtrue);
 }
+
 
 /*
 @@@@@@@@@@@@@@@@@@@@@
