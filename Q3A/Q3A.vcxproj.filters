@@ -719,16 +719,7 @@
     <None Include="qe3.ico">
       <Filter>Engine\Resource Files</Filter>
     </None>
-    <None Include="skybox.hlsl">
-      <Filter>Renderer\Shaders</Filter>
-    </None>
-    <None Include="generic.hlsl">
-      <Filter>Renderer\Shaders</Filter>
-    </None>
     <None Include="shade.hlsl">
-      <Filter>Renderer\Shaders</Filter>
-    </None>
-    <None Include="dlight.hlsl">
       <Filter>Renderer\Shaders</Filter>
     </None>
   </ItemGroup>

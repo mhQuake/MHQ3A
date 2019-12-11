@@ -1,16 +1,6 @@
 
-struct VS_SHADEVERTEX
-{
-	float4 Position: POSITION0;
-	float4 Color : COLOR0;
-	float2 TexCoord: TEXCOORD0;
-	float2 Lightmap: TEXCOORD1;
-	float3 Normal: NORMAL0;
-};
 
-
-struct PS_SHADEVERTEX
-{
+struct PS_SHADEVERTEX {
 	float4 Position: POSITION0;
 	float4 Color : COLOR0;
 
@@ -44,12 +34,32 @@ struct PS_SHADEVERTEX
 };
 
 
+struct GENERICVERTEX {
+	float4 Position: POSITION0;
+	float4 Color : COLOR0;
+	float2 TexCoord: TEXCOORD0;
+};
+
+
+struct SKYBOXVERTEX {
+	float4 Position: POSITION0;
+	float2 TexCoord: TEXCOORD0;
+};
+
+
+struct DLIGHTVERTEX {
+	float4 Position: POSITION0;
+	float3 TexCoord: TEXCOORD0;
+};
+
+
 #ifdef VERTEXSHADER
 float4x4 MVPMatrix : register(VSREG_MVPMATRIX);
 float4x4 ProjectionMatrix : register(VSREG_PROJECTIONMATRIX);
 float4x4 WorldMatrix : register(VSREG_MODELVIEWMATRIX);
 float4x4 SkyMatrix : register(VSREG_SKYMATRIX);
 float4 RTInverseSize : register(VSREG_INVERSERT);
+float4 moveOrigin : register(VSREG_MOVEORIGIN);
 
 float4 GetPositionWithHalfPixelCorrection (float4x4 mvp, float4 inPosition)
 {
@@ -91,7 +101,16 @@ float2 RB_CalcVectorTexcoords (float3 Position)
 }
 
 
-PS_SHADEVERTEX VSMain (VS_SHADEVERTEX vs_in)
+struct VS_SHADEVERTEX {
+	float4 Position: POSITION0;
+	float4 Color : COLOR0;
+	float2 TexCoord: TEXCOORD0;
+	float2 Lightmap: TEXCOORD1;
+	float3 Normal: NORMAL0;
+};
+
+
+PS_SHADEVERTEX VSShade (VS_SHADEVERTEX vs_in)
 {
 	PS_SHADEVERTEX vs_out;
 
@@ -135,12 +154,57 @@ PS_SHADEVERTEX VSMain (VS_SHADEVERTEX vs_in)
 
 	return vs_out;
 }
+
+
+GENERICVERTEX VSGeneric (float4 Position: POSITION0, float4 Color : COLOR0, float2 TexCoord: TEXCOORD0)
+{
+	GENERICVERTEX vs_out;
+
+	vs_out.Position = GetPositionWithHalfPixelCorrection (MVPMatrix, Position);
+	vs_out.Color = Color.bgra; 	// color was loaded as rgba so switch it back to bgra
+	vs_out.TexCoord = TexCoord;
+
+	return vs_out;
+}
+
+
+SKYBOXVERTEX VSSkybox (float4 Position: POSITION0, float2 TexCoord: TEXCOORD0)
+{
+	SKYBOXVERTEX vs_out;
+
+	vs_out.Position = GetPositionWithHalfPixelCorrection (MVPMatrix, Position + moveOrigin);
+	vs_out.Position.z = vs_out.Position.w;
+	vs_out.TexCoord = TexCoord;
+
+	return vs_out;
+}
+
+
+DLIGHTVERTEX VSDynamicLight (float4 Position: POSITION0)
+{
+	DLIGHTVERTEX vs_out;
+
+	vs_out.Position = GetPositionWithHalfPixelCorrection (MVPMatrix, Position);
+	vs_out.TexCoord = Position.xyz;
+
+	return vs_out;
+}
 #endif
 
 
 #ifdef PIXELSHADER
+// allow this to be reusable across multiple shader types
+#ifdef TEXTURESTAGE
 texture tmu0Texture : register(TEXTURESTAGE);
+#else
+texture tmu0Texture : register(t0);
+#endif
+
+#ifdef SAMPLERSTAGE
 sampler tmu0Sampler : register(SAMPLERSTAGE) = sampler_state { texture = <tmu0Texture>; };
+#else
+sampler tmu0Sampler : register(s0) = sampler_state { texture = <tmu0Texture>; };
+#endif
 
 float4 tmMatrix0 : register(PSREG_TMODMATRIX0);
 float4 tmMatrix1 : register(PSREG_TMODMATRIX1);
@@ -242,7 +306,57 @@ float4 GetGammaAndBrightness (float4 color)
 	return float4 (pow (max (color.rgb, 0.0f), r_gamma.x) * r_brightness.x, color.a);
 }
 
-float4 PSMain (PS_SHADEVERTEX ps_in) : COLOR0
+
+float3 HUEtoRGB (in float H)
+{
+	float R = abs (H * 6 - 3) - 1;
+	float G = 2 - abs (H * 6 - 2);
+	float B = 2 - abs (H * 6 - 4);
+	return saturate (float3 (R, G, B));
+}
+
+
+float3 HSLtoRGB (in float3 HSL)
+{
+	float3 RGB = HUEtoRGB (HSL.x);
+		float C = (1 - abs (2 * HSL.z - 1)) * HSL.y;
+	return (RGB - 0.5) * C + HSL.z;
+}
+
+
+float Epsilon = 1e-10;
+
+float3 RGBtoHCV (in float3 RGB)
+{
+	// Based on work by Sam Hocevar and Emil Persson
+	float4 P = (RGB.g < RGB.b) ? float4 (RGB.bg, -1.0, 2.0 / 3.0) : float4 (RGB.gb, 0.0, -1.0 / 3.0);
+		float4 Q = (RGB.r < P.x) ? float4 (P.xyw, RGB.r) : float4 (RGB.r, P.yzx);
+		float C = Q.x - min (Q.w, Q.y);
+	float H = abs ((Q.w - Q.y) / (6 * C + Epsilon) + Q.z);
+	return float3 (H, C, Q.x);
+}
+
+
+float3 RGBtoHSL (in float3 RGB)
+{
+	float3 HCV = RGBtoHCV (RGB);
+		float L = HCV.z - HCV.y * 0.5;
+	float S = HCV.y / (1 - abs (L * 2 - 1) + Epsilon);
+	return float3 (HCV.x, S, L);
+}
+
+
+float4 Desaturate (float4 Colour)
+{
+	float desaturation = 0.5f;
+
+	// hack hack hack - because light can overbright we scale it down, then apply the desaturation, then bring it back up again
+	// otherwise we get clamping issues in the conversion funcs if any of the channels are above 1
+	return float4 (HSLtoRGB (RGBtoHSL (Colour.rgb * 0.1f) * float3 (1.0f, desaturation, 1.0f)) * 10.0f, Colour.a);
+}
+
+
+float4 PSShade (PS_SHADEVERTEX ps_in) : COLOR0
 {
 	// read the initial texcoord
 #if defined (TCGEN_SKY)
@@ -287,7 +401,43 @@ float4 PSMain (PS_SHADEVERTEX ps_in) : COLOR0
 
 	// read the texture with the final generated and modified texcoord;
 	// the textures were loaded as RGBA so here we must swizzle them back to BGRA
-	return GetGammaAndBrightness (tex2D (tmu0Sampler, st).bgra * ps_in.Color);
+#if defined (TCGEN_LIGHTMAP)
+	// lighting is not gamma-adjusted but does scale for overbrighting (alpha is not scaled)
+	return Desaturate (tex2D (tmu0Sampler, st).bgra) * ps_in.Color * float4 (2.0f, 2.0f, 2.0f, 1.0f);
+#else
+	return GetGammaAndBrightness (tex2D (tmu0Sampler, st).bgra) * ps_in.Color;
+#endif
+}
+
+
+float4 PSGeneric (GENERICVERTEX ps_in) : COLOR0
+{
+	// the textures were loaded as RGBA so here we must swizzle them back to BGRA
+	return GetGammaAndBrightness (tex2D (tmu0Sampler, ps_in.TexCoord).bgra) * ps_in.Color;
+}
+
+
+float4 identityLight : register(PSREG_IDENTITYLIGHT);
+
+float4 PSSkybox (SKYBOXVERTEX ps_in) : COLOR0
+{
+	// the textures were loaded as RGBA so here we must swizzle them back to BGRA
+	return GetGammaAndBrightness (tex2D (tmu0Sampler, ps_in.TexCoord).bgra) * identityLight;
+}
+
+
+float radius : register(PSREG_DLRADIUS);
+float3 origin : register(PSREG_DLORIGIN);
+float3 colour : register(PSREG_DLCOLOUR);
+
+float4 PSDynamicLight (DLIGHTVERTEX ps_in) : COLOR0
+{
+	float dist = radius - length (ps_in.TexCoord - origin);
+
+	clip (dist);
+
+	// the original engine did inverse-square falloff; this does linear falloff but properly
+	return GetGammaAndBrightness (float4 (colour * (dist / radius), 0));
 }
 #endif
 

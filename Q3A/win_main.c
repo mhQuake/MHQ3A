@@ -1260,30 +1260,97 @@ void Sys_Init (void)
 
 int	totalMsec, countMsec;
 
+// http://ntcoder.com/bab/tag/getuserprofiledirectory/
+#include "userenv.h"
+#pragma comment (lib, "userenv.lib")
+
+char *Sys_GetUserHomeDir (void)
+{
+	static char szHomeDirBuf[MAX_PATH] = { 0 };
+
+	// We need a process with query permission set
+	HANDLE hToken = 0;
+	DWORD BufSize = MAX_PATH;
+
+	OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &hToken);
+
+	// Returns a path like C:/Documents and Settings/nibu if my user name is nibu
+	GetUserProfileDirectory (hToken, szHomeDirBuf, &BufSize);
+
+	// Close handle opened via OpenProcessToken
+	CloseHandle (hToken);
+
+	return szHomeDirBuf;
+}
+
+
+BOOL Sys_DirectoryExists (LPCTSTR szPath)
+{
+	DWORD dwAttrib = GetFileAttributes (szPath);
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+
+BOOL Sys_FileExists (LPCTSTR szPath)
+{
+	DWORD dwAttrib = GetFileAttributes (szPath);
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+
 void Sys_SetWorkingDirectory (void)
 {
-	int i;
+	int i, j, k;
+
+	char *homeDir = Sys_GetUserHomeDir ();
 
 	const char *testDirs[] = {
 		// these are the locations I have Quake installed to on various PCs; you may want to change it yourself
-		"C:\\Desktop Crap\\Q3A", "C:\\Games\\Quake III", "C:\\Quake III", NULL
+		homeDir,
+		"\\Desktop Crap",
+		"\\Games",
+		"",
+		NULL
 	};
 
+	const char *qDirs[] = {
+		"Quake III",
+		"QuakeIII",
+		"Quake3",
+		"Quake 3",
+		"Q III",
+		"QIII",
+		"Q3",
+		"Q3A",
+		"Q 3",
+		NULL
+	};
+
+	const char *qFiles[] = {
+		"pak0.pk3",
+		"q3config.cfg",
+		NULL
+	};
+
+	// try to find ID1 content in the test paths
 	for (i = 0;; i++)
 	{
-		FILE *f = NULL;
-		char testPath[MAX_PATH];
-
 		if (!testDirs[i]) break;
+		if (!Sys_DirectoryExists (testDirs[i])) continue;
 
-		sprintf (testPath, "%s\\baseq3\\pak0.pk3", testDirs[i]);
-
-		// try to find pak0.pak
-		if ((f = fopen (testPath, "rb")) != NULL)
+		for (j = 0;; j++)
 		{
-			fclose (f);
-			SetCurrentDirectory (testDirs[i]);
-			return;
+			if (!qDirs[j]) break;
+			if (!Sys_DirectoryExists (va ("%s\\%s\\"BASEGAME, testDirs[i], qDirs[j]))) continue;
+
+			for (k = 0;; k++)
+			{
+				if (!qFiles[k]) break;
+				if (!Sys_FileExists (va ("%s\\%s\\"BASEGAME"\\%s", testDirs[i], qDirs[j], qFiles[k]))) continue;
+
+				SetCurrentDirectory (va ("%s\\%s", testDirs[i], qDirs[j]));
+				return;
+			}
 		}
 	}
 }

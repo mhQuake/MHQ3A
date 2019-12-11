@@ -2104,8 +2104,10 @@ R_SetColorMappings
 void R_SetColorMappings (void)
 {
 	// setup the overbright lighting
-	tr.identityLight = 0.5f;
-	tr.identityLightByte = 127;
+//	tr.identityLight = 0.5f;
+//	tr.identityLightByte = 127;
+	tr.identityLightFloat = 1.0f;
+	tr.identityLightByte = 255;
 }
 
 

@@ -398,9 +398,9 @@ static void ComputeColors (shaderStage_t *pStage)
 	case CGEN_VERTEX:
 		for (int i = 0; i < tess.numVertexes; i++)
 		{
-			r_stagedynamicverts[i].rgba[0] = tess.vertexColors[i][0] * tr.identityLight;
-			r_stagedynamicverts[i].rgba[1] = tess.vertexColors[i][1] * tr.identityLight;
-			r_stagedynamicverts[i].rgba[2] = tess.vertexColors[i][2] * tr.identityLight;
+			r_stagedynamicverts[i].rgba[0] = tess.vertexColors[i][0] * tr.identityLightFloat;
+			r_stagedynamicverts[i].rgba[1] = tess.vertexColors[i][1] * tr.identityLightFloat;
+			r_stagedynamicverts[i].rgba[2] = tess.vertexColors[i][2] * tr.identityLightFloat;
 			r_stagedynamicverts[i].rgba[3] = tess.vertexColors[i][3];
 		}
 		break;
@@ -408,9 +408,9 @@ static void ComputeColors (shaderStage_t *pStage)
 	case CGEN_ONE_MINUS_VERTEX:
 		for (int i = 0; i < tess.numVertexes; i++)
 		{
-			r_stagedynamicverts[i].rgba[0] = (255 - tess.vertexColors[i][0]) * tr.identityLight;
-			r_stagedynamicverts[i].rgba[1] = (255 - tess.vertexColors[i][1]) * tr.identityLight;
-			r_stagedynamicverts[i].rgba[2] = (255 - tess.vertexColors[i][2]) * tr.identityLight;
+			r_stagedynamicverts[i].rgba[0] = (255 - tess.vertexColors[i][0]) * tr.identityLightFloat;
+			r_stagedynamicverts[i].rgba[1] = (255 - tess.vertexColors[i][1]) * tr.identityLightFloat;
+			r_stagedynamicverts[i].rgba[2] = (255 - tess.vertexColors[i][2]) * tr.identityLightFloat;
 		}
 		break;
 

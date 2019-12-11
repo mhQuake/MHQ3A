@@ -962,7 +962,7 @@ typedef struct
 
 	viewParms_t				viewParms;
 
-	float					identityLight;
+	float					identityLightFloat;
 	int						identityLightByte;
 
 	qboolean				hasStretchRaw;

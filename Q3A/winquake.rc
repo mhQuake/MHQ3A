@@ -2,10 +2,5 @@
 #include "resource.h"
 
 IDI_ICON1               ICON    DISCARDABLE     "qe3.ico"
-
-IDR_GENERIC_HLSL		RCDATA		"generic.hlsl"
 IDR_SHADE_HLSL			RCDATA		"shade.hlsl"
-IDR_SKYBOX_HLSL			RCDATA		"skybox.hlsl"
-IDR_DLIGHT_HLSL			RCDATA		"dlight.hlsl"
-
 

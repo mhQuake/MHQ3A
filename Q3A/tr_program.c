@@ -117,7 +117,9 @@ static ID3DBlob *R_CompileShaderCommon (const char *src, int len, const char *en
 
 	if (ErrorBlob)
 	{
-		ri.Printf (PRINT_WARNING, "Shader %s error:\n%s\n", entrypoint, (char *) ErrorBlob->lpVtbl->GetBufferPointer (ErrorBlob));
+		// done this way so i can catch the error string in the debuggers watch window
+		char *errorString = (char *) ErrorBlob->lpVtbl->GetBufferPointer (ErrorBlob);
+		ri.Printf (PRINT_WARNING, "Shader %s error:\n%s\n", entrypoint, errorString);
 		ErrorBlob->lpVtbl->Release (ErrorBlob);
 	}
 	else if (FAILED (hr))
@@ -128,7 +130,7 @@ static ID3DBlob *R_CompileShaderCommon (const char *src, int len, const char *en
 }
 
 
-IDirect3DVertexShader9 *R_CreateVertexShader (char *src, int len, D3D_SHADER_MACRO *defines)
+IDirect3DVertexShader9 *R_CreateVertexShader (char *src, int len, char *entrypoint, D3D_SHADER_MACRO *defines)
 {
 	IDirect3DVertexShader9 *vs = NULL;
 	ID3DBlob *ShaderBlob = NULL;
@@ -137,7 +139,7 @@ IDirect3DVertexShader9 *R_CreateVertexShader (char *src, int len, D3D_SHADER_MAC
 	defines[0].Name = "VERTEXSHADER";
 	defines[0].Definition = "1";
 
-	if ((ShaderBlob = R_CompileShaderCommon (src, len, "VSMain", defines, "vs_3_0")) != NULL)
+	if ((ShaderBlob = R_CompileShaderCommon (src, len, va ("VS%s", entrypoint), defines, "vs_3_0")) != NULL)
 	{
 		d3d_Device->lpVtbl->CreateVertexShader (d3d_Device, (DWORD *) ShaderBlob->lpVtbl->GetBufferPointer (ShaderBlob), &vs);
 		ShaderBlob->lpVtbl->Release (ShaderBlob);
@@ -147,7 +149,7 @@ IDirect3DVertexShader9 *R_CreateVertexShader (char *src, int len, D3D_SHADER_MAC
 }
 
 
-IDirect3DPixelShader9 *R_CreatePixelShader (char *src, int len, D3D_SHADER_MACRO *defines)
+IDirect3DPixelShader9 *R_CreatePixelShader (char *src, int len, char *entrypoint, D3D_SHADER_MACRO *defines)
 {
 	IDirect3DPixelShader9 *ps = NULL;
 	ID3DBlob *ShaderBlob = NULL;
@@ -156,7 +158,7 @@ IDirect3DPixelShader9 *R_CreatePixelShader (char *src, int len, D3D_SHADER_MACRO
 	defines[0].Name = "PIXELSHADER";
 	defines[0].Definition = "1";
 
-	if ((ShaderBlob = R_CompileShaderCommon (src, len, "PSMain", defines, "ps_3_0")) != NULL)
+	if ((ShaderBlob = R_CompileShaderCommon (src, len, va ("PS%s", entrypoint), defines, "ps_3_0")) != NULL)
 	{
 		d3d_Device->lpVtbl->CreatePixelShader (d3d_Device, (DWORD *) ShaderBlob->lpVtbl->GetBufferPointer (ShaderBlob), &ps);
 		ShaderBlob->lpVtbl->Release (ShaderBlob);
@@ -191,10 +193,10 @@ qboolean RB_CheckShaderCache (shaderStage_t *pStage, int stageKey)
 }
 
 
-void RB_CreateShaderCache (shaderStage_t *pStage, int stageKey, char *source, int length, D3D_SHADER_MACRO *stageDefines)
+void RB_CreateShaderCache (shaderStage_t *pStage, int stageKey, char *source, int length, char *entrypoint, D3D_SHADER_MACRO *stageDefines)
 {
-	pStage->vertexShader = R_CreateVertexShader (source, length, stageDefines);
-	pStage->pixelShader = R_CreatePixelShader (source, length, stageDefines);
+	pStage->vertexShader = R_CreateVertexShader (source, length, entrypoint, stageDefines);
+	pStage->pixelShader = R_CreatePixelShader (source, length, entrypoint, stageDefines);
 
 	// add them to the cache
 	if (numShaderCache < MAX_SHADER_CACHE)
@@ -233,7 +235,7 @@ int Sys_LoadResourceData (int resourceid, void **resbuf)
 }
 
 
-void R_CreateBuiltinProgram (program_t *prog, int resourceID, DWORD FVF)
+void R_CreateBuiltinProgram (program_t *prog, char *entrypoint, int resourceID, DWORD FVF)
 {
 	char *src = NULL;
 	int len = Sys_LoadResourceData (resourceID, (void **) &src);
@@ -245,8 +247,8 @@ void R_CreateBuiltinProgram (program_t *prog, int resourceID, DWORD FVF)
 	// and create the program
 	d3d_Device->lpVtbl->CreateVertexDeclaration (d3d_Device, elem, &prog->vd);
 
-	prog->vs = R_CreateVertexShader (src, len, staticDefines);
-	prog->ps = R_CreatePixelShader (src, len, staticDefines);
+	prog->vs = R_CreateVertexShader (src, len, entrypoint, staticDefines);
+	prog->ps = R_CreatePixelShader (src, len, entrypoint, staticDefines);
 }
 
 
@@ -340,9 +342,9 @@ void GL_InitPrograms (void)
 		}
 
 		// now create our builtin programs - for simplicity these will use FVF codes instead of full decls
-		R_CreateBuiltinProgram (&r_genericProgram, IDR_GENERIC_HLSL, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-		R_CreateBuiltinProgram (&r_skyboxProgram, IDR_SKYBOX_HLSL, D3DFVF_XYZ | D3DFVF_TEX1);
-		R_CreateBuiltinProgram (&r_dlightProgram, IDR_DLIGHT_HLSL, D3DFVF_XYZ);
+		R_CreateBuiltinProgram (&r_genericProgram, "Generic", IDR_SHADE_HLSL, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+		R_CreateBuiltinProgram (&r_skyboxProgram, "Skybox", IDR_SHADE_HLSL, D3DFVF_XYZ | D3DFVF_TEX1);
+		R_CreateBuiltinProgram (&r_dlightProgram, "DynamicLight", IDR_SHADE_HLSL, D3DFVF_XYZ);
 
 		// this must match the layout of the vertex structs
 		D3DVERTEXELEMENT9 stageLayout[] = {
@@ -453,8 +455,8 @@ void R_CreateHLSLProgramFromShader (shader_t *sh)
 	// ensure that it's initialized
 	GL_InitPrograms ();
 
-	char *source = NULL;
-	int length = Sys_LoadResourceData (IDR_SHADE_HLSL, (void **) &source);
+//	char *source = NULL;
+//	int length = Sys_LoadResourceData (IDR_SHADE_HLSL, (void **) &source);
 
 	for (int i = 0; i < MAX_SHADER_STAGES; i++)
 	{
@@ -544,7 +546,10 @@ void R_CreateHLSLProgramFromShader (shader_t *sh)
 		if (!RB_CheckShaderCache (pStage, stageKey))
 		{
 			// create the stage shaders
-			RB_CreateShaderCache (pStage, stageKey, source, length, stageDefines);
+			char *source = NULL;
+			int length = Sys_LoadResourceData (IDR_SHADE_HLSL, (void **) &source);
+
+			RB_CreateShaderCache (pStage, stageKey, source, length, "Shade", stageDefines);
 		}
 	}
 }

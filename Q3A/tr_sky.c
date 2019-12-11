@@ -53,7 +53,7 @@ static void R_DrawSkyBox (image_t *boximages[], int stateBits)
 	GL_State (stateBits);
 	RB_SetProgram (&r_skyboxProgram);
 
-	float identityLight[] = {tr.identityLight, tr.identityLight, tr.identityLight, 1};
+	float identityLight[] = { tr.identityLightFloat, tr.identityLightFloat, tr.identityLightFloat, 1 };
 	float moveOrigin[] = {backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2], 0};
 
 	d3d_Device->lpVtbl->SetVertexShaderConstantF (d3d_Device, VSREG_MOVEORIGIN, moveOrigin, 1);

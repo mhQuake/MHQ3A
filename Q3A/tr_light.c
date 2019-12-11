@@ -310,17 +310,17 @@ void R_SetupEntityLighting (const trRefdef_t *refdef, trRefEntity_t *ent)
 		R_SetupEntityLightingGrid (ent);
 	else
 	{
-		ent->ambientLight[0] = ent->ambientLight[1] = ent->ambientLight[2] = tr.identityLight * 150;
-		ent->directedLight[0] = ent->directedLight[1] = ent->directedLight[2] = tr.identityLight * 150;
+		ent->ambientLight[0] = ent->ambientLight[1] = ent->ambientLight[2] = tr.identityLightFloat * 150;
+		ent->directedLight[0] = ent->directedLight[1] = ent->directedLight[2] = tr.identityLightFloat * 150;
 		VectorCopy (tr.sunDirection, ent->lightDir);
 	}
 
 	// bonus items and view weapons have a fixed minimum add
 	if (ent->e.renderfx & RF_MINLIGHT)
 	{
-		ent->ambientLight[0] += tr.identityLight * 32;
-		ent->ambientLight[1] += tr.identityLight * 32;
-		ent->ambientLight[2] += tr.identityLight * 32;
+		ent->ambientLight[0] += tr.identityLightFloat * 32;
+		ent->ambientLight[1] += tr.identityLightFloat * 32;
+		ent->ambientLight[2] += tr.identityLightFloat * 32;
 	}
 
 	// modify the light by dynamic lights

@@ -573,7 +573,7 @@ void RB_CalcWaveColor (const waveForm_t *wf, unsigned char *dstColors)
 
 	if (wf->func == GF_NOISE)
 		glow = wf->base + R_NoiseGet4f (0, 0, 0, (tess.shaderTime + wf->phase) * wf->frequency) * wf->amplitude;
-	else glow = EvalWaveForm (wf) * tr.identityLight;
+	else glow = EvalWaveForm (wf) * tr.identityLightFloat;
 
 	if (glow < 0)
 		glow = 0;

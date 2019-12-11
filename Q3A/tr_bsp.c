@@ -95,7 +95,7 @@ static	void R_LoadLightmaps (lump_t *l)
 	for (i = 0; i < tr.numLightmaps; i++)
 	{
 		// expand the 24 bit on-disk to 32 bit
-		buf_p = buf + i * LIGHTMAP_SIZE*LIGHTMAP_SIZE * 3;
+		buf_p = buf + i * LIGHTMAP_SIZE * LIGHTMAP_SIZE * 3;
 
 		for (j = 0; j < LIGHTMAP_SIZE * LIGHTMAP_SIZE; j++)
 		{
@@ -1619,9 +1619,9 @@ static	void R_LoadFogs (lump_t *l, lump_t *brushesLump, lump_t *sidesLump)
 
 		out->parms = shader->fogParms;
 
-		out->colorInt = ColorBytes4 (shader->fogParms.color[0] * tr.identityLight,
-			shader->fogParms.color[1] * tr.identityLight,
-			shader->fogParms.color[2] * tr.identityLight, 1.0);
+		out->colorInt = ColorBytes4 (shader->fogParms.color[0] * tr.identityLightFloat,
+			shader->fogParms.color[1] * tr.identityLightFloat,
+			shader->fogParms.color[2] * tr.identityLightFloat, 1.0);
 
 		d = shader->fogParms.depthForOpaque < 1 ? 1 : shader->fogParms.depthForOpaque;
 		out->tcScale = 1.0f / (d * 8);

@@ -352,18 +352,7 @@
     <ResourceCompile Include="winquake.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="generic.hlsl">
-      <FileType>Document</FileType>
-    </None>
     <None Include="shade.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="skybox.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="dlight.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
