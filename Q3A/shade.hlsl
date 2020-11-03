@@ -79,6 +79,7 @@ float4 tmTurbTime : register(VSREG_TMODTURBTIME);
 
 float2 RB_CalcTurbTexCoords (float4 Position, float time)
 {
+	// this replicates the vertex turn in stock Q3A; should we change it to the same turn as Q1/Q2?  or provide an option to toggle them?
 	return float2 (
 		((Position.x + Position.z) * 1.0f / 128.0f * 0.125f + time) * (M_PI * 2.0f),
 		(Position.y * 1.0f / 128.0f * 0.125f + time) * (M_PI * 2.0f)
@@ -300,6 +301,7 @@ float2 RB_CalcEnvironmentTexCoords (float3 Position, float3 Normal)
 // ============================================================================================
 float4 r_gamma : register(PSREG_GAMMA);
 float4 r_brightness : register(PSREG_BRIGHTNESS);
+float4 r_desaturation : register(PSREG_DESATURATION);
 
 float4 GetGammaAndBrightness (float4 color)
 {
@@ -348,11 +350,9 @@ float3 RGBtoHSL (in float3 RGB)
 
 float4 Desaturate (float4 Colour)
 {
-	float desaturation = 0.5f;
-
 	// hack hack hack - because light can overbright we scale it down, then apply the desaturation, then bring it back up again
 	// otherwise we get clamping issues in the conversion funcs if any of the channels are above 1
-	return float4 (HSLtoRGB (RGBtoHSL (Colour.rgb * 0.1f) * float3 (1.0f, desaturation, 1.0f)) * 10.0f, Colour.a);
+	return float4 (HSLtoRGB (RGBtoHSL (Colour.rgb * 0.1f) * float3 (1.0f, r_desaturation.x, 1.0f)) * 10.0f, Colour.a);
 }
 
 
@@ -399,13 +399,20 @@ float4 PSShade (PS_SHADEVERTEX ps_in) : COLOR0
 	st = mul (float2x2 (tmMatrix3.xzyw), st) + tmTranslate3;
 #endif
 
+	// scale for overbrighting in certain stages
+#if defined OVERBRIGHT_2X
+	float overbright = 2.0f;
+#else
+	float overbright = 1.0f;
+#endif
+
 	// read the texture with the final generated and modified texcoord;
 	// the textures were loaded as RGBA so here we must swizzle them back to BGRA
 #if defined (TCGEN_LIGHTMAP)
-	// lighting is not gamma-adjusted but does scale for overbrighting (alpha is not scaled)
-	return Desaturate (tex2D (tmu0Sampler, st).bgra) * ps_in.Color * float4 (2.0f, 2.0f, 2.0f, 1.0f);
+	// lighting is not gamma-adjusted
+	return tex2D (tmu0Sampler, st).bgra * ps_in.Color * overbright;
 #else
-	return GetGammaAndBrightness (tex2D (tmu0Sampler, st).bgra) * ps_in.Color;
+	return GetGammaAndBrightness (tex2D (tmu0Sampler, st).bgra) * ps_in.Color * overbright;
 #endif
 }
 

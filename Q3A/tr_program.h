@@ -35,6 +35,7 @@
 #define PSREG_IDENTITYLIGHT			17
 #define PSREG_GAMMA					18
 #define PSREG_BRIGHTNESS			19
+#define PSREG_DESATURATION			20
 
 typedef struct program_s
 {

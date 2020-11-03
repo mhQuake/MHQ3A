@@ -104,6 +104,7 @@ cvar_t	*r_textureMode;
 cvar_t	*r_depthBiasFactor;
 cvar_t	*r_gamma;
 cvar_t	*r_brightness;
+cvar_t	*r_desaturate_lightmaps;
 cvar_t	*r_intensity;
 cvar_t	*r_lockpvs;
 cvar_t	*r_noportals;
@@ -669,6 +670,7 @@ void R_Register (void)
 
 	r_gamma = ri.Cvar_Get ("r_gamma", "1", CVAR_ARCHIVE);
 	r_brightness = ri.Cvar_Get ("r_brightness", "1", CVAR_ARCHIVE);
+	r_desaturate_lightmaps = ri.Cvar_Get ("r_desaturate_lightmaps", "1", CVAR_ARCHIVE);
 
 	r_facePlaneCull = ri.Cvar_Get ("r_facePlaneCull", "1", CVAR_ARCHIVE);
 

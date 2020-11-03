@@ -63,6 +63,7 @@ static D3D_SHADER_MACRO staticDefines[] = {
 	DEFINE_SHADER_REGISTER (PSREG_IDENTITYLIGHT),
 	DEFINE_SHADER_REGISTER (PSREG_GAMMA),
 	DEFINE_SHADER_REGISTER (PSREG_BRIGHTNESS),
+	DEFINE_SHADER_REGISTER (PSREG_DESATURATION),
 	// we always need to close the static defines in case a generated shader adds no new defines
 	{NULL, NULL}
 };
@@ -455,9 +456,6 @@ void R_CreateHLSLProgramFromShader (shader_t *sh)
 	// ensure that it's initialized
 	GL_InitPrograms ();
 
-//	char *source = NULL;
-//	int length = Sys_LoadResourceData (IDR_SHADE_HLSL, (void **) &source);
-
 	for (int i = 0; i < MAX_SHADER_STAGES; i++)
 	{
 		// create program sources for this stage
@@ -495,6 +493,14 @@ void R_CreateHLSLProgramFromShader (shader_t *sh)
 
 		stageDefines[currStageDefine].Definition = standardDefinition;
 		currStageDefine++;
+
+		// flag for overbrighting
+		if (pStage->bundle.tcGen == TCGEN_LIGHTMAP)
+		{
+			stageDefines[currStageDefine].Name = "OVERBRIGHT_2X";
+			stageDefines[currStageDefine].Definition = standardDefinition;
+			currStageDefine++;
+		}
 
 		// evaluate texcoord modification type
 		for (int tm = 0; tm < pStage->bundle.numTexMods; tm++)

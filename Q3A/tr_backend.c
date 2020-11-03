@@ -350,11 +350,13 @@ void RB_SetupObliqueNearPlane (float *matrix, float *clipPlane)
 void RB_SetGammaAndBrightness (void)
 {
 	// rather than doing a separate brightpass we'll setup gamma and brightness in our shaders
-	float gamma[4] = {r_gamma->value, r_gamma->value, r_gamma->value, r_gamma->value};
-	float brightness[4] = {r_brightness->value, r_brightness->value, r_brightness->value, r_brightness->value};
+	float gamma[4] = { r_gamma->value, r_gamma->value, r_gamma->value, r_gamma->value };
+	float brightness[4] = { r_brightness->value, r_brightness->value, r_brightness->value, r_brightness->value };
+	float desat[4] = { r_desaturate_lightmaps->value, r_desaturate_lightmaps->value, r_desaturate_lightmaps->value, r_desaturate_lightmaps->value };
 
 	d3d_Device->lpVtbl->SetPixelShaderConstantF (d3d_Device, PSREG_GAMMA, gamma, 1);
 	d3d_Device->lpVtbl->SetPixelShaderConstantF (d3d_Device, PSREG_BRIGHTNESS, brightness, 1);
+	d3d_Device->lpVtbl->SetPixelShaderConstantF (d3d_Device, PSREG_DESATURATION, desat, 1);
 }
 
 
